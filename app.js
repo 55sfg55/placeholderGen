@@ -52,7 +52,7 @@ app.get('/image/:dimensions?/:color?', (req, res) => {
 });
 
 app.get('/', (req, res) => {
-  res.send('Welcome to the golden generator!');
+  res.send('Welcome to the placeholder generator!');
 });
 
 app.listen(port, () => {
