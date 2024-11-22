@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "canvas": "^2.11.2",
+    "express": "^4.21.1",
+    "nodemon": "^3.1.7"
+  }
+}
