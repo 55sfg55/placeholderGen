@@ -11,6 +11,9 @@ function parseColor(colorString) {
     if (/^[a-fA-F0-9]{6}$/.test(colorString)) {
       colorString = `#${colorString}`;
     }
+    if (colorString === undefined) {
+        return color("white").hex();
+    }
     
     return color(colorString).hex();
   } catch (e) {
