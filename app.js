@@ -1,39 +1,57 @@
-const express = require('express')
-const { createCanvas } = require('canvas')
+const express = require('express');
+const { createCanvas } = require('canvas');
+const color = require('color');
 
-const app = express()
-const port = 3300
+const app = express();
+const port = 3300;
+
+function parseColor(colorString) {
+  try {
+    // http://127.0.0.1:3300/image/300x500/ffff00
+    if (/^[a-fA-F0-9]{6}$/.test(colorString)) {
+      colorString = `#${colorString}`;
+    }
+    
+    return color(colorString).hex();
+  } catch (e) {
+    return null; 
+  }
+}
 
 app.get('/image/:dimensions?/:color?', (req, res) => {
-    const { dimensions } = req.params;
+  const { dimensions, color } = req.params;
 
-    console.log(dimensions)
+  const [width, height] = dimensions.split('x').map(Number);
 
-    const [ width, height ] = dimensions.split('x').map(Number);
+  if (isNaN(width) || isNaN(height) || width <= 0 || height <= 0) {
+    return res.status(400).send('Invalid dimensions. Please provide valid width and height in the format WIDTHxHEIGHT (e.g. /image/300x200).');
+  }
 
-    if ( isNaN(width) || isNaN(height) || width <= 0 || height <= 0 ) {
-        return res.status(400).send('Invalid dimensions. Please provide valid width and height in the format WIDTHxHEIGHT (e.g. /image/300x200).');
-    }
-    const canvas = createCanvas(width, height);
-    const ctx = canvas.getContext('2d');
+  const parsedColor = parseColor(color);
+  if (!parsedColor) {
+    return res.status(400).send('Invalid color. Please provide a valid color name (e.g. red), HEX (e.g. ff0000), or RGB (e.g. rgb(255, 0, 0)).');
+  }
 
-    ctx.fillStyle = '#d3d3d3';
-    ctx.fillRect(0, 0, width, height);
+  const canvas = createCanvas(width, height);
+  const ctx = canvas.getContext('2d');
 
-    ctx.fillStyle = '#000';
-    ctx.font = '30px Arial';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(`${width}x${height}`, width / 2, height / 2);
+  ctx.fillStyle = parsedColor;
+  ctx.fillRect(0, 0, width, height);
 
-    res.setHeader('Content-Type', 'image/png');
-    res.send( canvas.toBuffer() );
-})
+  ctx.fillStyle = '#000';
+  ctx.font = '30px Arial';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(`${width}x${height}`, width / 2, height / 2);
+
+  res.setHeader('Content-Type', 'image/png');
+  res.send(canvas.toBuffer());
+});
 
 app.get('/', (req, res) => {
-    res.send('Welcome to placegolden generator!')
-})
+  res.send('Welcome to the golden generator!');
+});
 
 app.listen(port, () => {
-    console.log(`Server is crashing at http://127.0.0.1:${port}`)
-})
+  console.log(`Server is running at http://127.0.0.1:${port}`);
+});
