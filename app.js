@@ -21,6 +21,15 @@ function parseColor(colorString) {
   }
 }
 
+// function drawLine(ctx, startX, startY, endX, endY, color = '#000', lineWidth = 1) {
+//     ctx.beginPath(); 
+//     ctx.moveTo(startX, startY); 
+//     ctx.lineTo(endX, endY); 
+//     ctx.strokeStyle = color; 
+//     ctx.lineWidth = lineWidth; 
+//     ctx.stroke(); 
+//   }
+
 app.get('/image/:dimensions?/:color?', (req, res) => {
   const { dimensions, color } = req.params;
 
@@ -47,6 +56,24 @@ app.get('/image/:dimensions?/:color?', (req, res) => {
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillText(text, width / 2, height / 2);
+
+//   const lineWidth = width/5*(0.5+height/width)*0.5/50
+
+//   drawLine(ctx, width * 0.01, height-height*0.01, width*0.1, height-height*0.1, '#000', lineWidth)
+//   drawLine(ctx, width * 0.01, height-height*0.01, width*0.1, height-height*0.01, '#000', lineWidth)
+//   drawLine(ctx, width * 0.01, height-height*0.01, width*0.01, height-height*0.1, '#000', lineWidth)
+
+//   drawLine(ctx, width * 0.01, height*0.01, width*0.1, height*0.1, '#000', lineWidth)
+//   drawLine(ctx, width * 0.01, height*0.01, width*0.1, height*0.01, '#000', lineWidth)
+//   drawLine(ctx, width * 0.01, height*0.01, width*0.01, height*0.1, '#000', lineWidth)
+
+//   drawLine(ctx, width-width * 0.01, height-height*0.01, width-width*0.1, height-height*0.1, '#000', lineWidth)
+//   drawLine(ctx, width-width * 0.01, height-height*0.01, width-width*0.1, height-height*0.01, '#000', lineWidth)
+//   drawLine(ctx, width-width * 0.01, height-height*0.01, width-width*0.01, height-height*0.1, '#000', lineWidth)
+  
+//   drawLine(ctx, width-width * 0.01, height*0.01, width-width*0.1, height*0.1, '#000', lineWidth)
+//   drawLine(ctx, width-width * 0.01, height*0.01, width-width*0.1, height*0.01, '#000', lineWidth)
+//   drawLine(ctx, width-width * 0.01, height*0.01, width-width*0.01, height*0.1, '#000', lineWidth)
 
   res.setHeader('Content-Type', 'image/png');
   res.send(canvas.toBuffer());
