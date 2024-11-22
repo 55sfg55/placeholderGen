@@ -42,10 +42,11 @@ app.get('/image/:dimensions?/:color?', (req, res) => {
   ctx.fillRect(0, 0, width, height);
 
   ctx.fillStyle = '#000';
-  ctx.font = '30px Arial';
+  ctx.font = `${width/5*(0.5+height/width)*0.5}px Arial`
+  const text = `${width}x${height}`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText(`${width}x${height}`, width / 2, height / 2);
+  ctx.fillText(text, width / 2, height / 2);
 
   res.setHeader('Content-Type', 'image/png');
   res.send(canvas.toBuffer());
