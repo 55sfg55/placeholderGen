@@ -50,30 +50,25 @@ app.get('/image/:dimensions?/:color?', (req, res) => {
   ctx.fillStyle = parsedColor;
   ctx.fillRect(0, 0, width, height);
 
-  ctx.fillStyle = '#000';
-  ctx.font = `${width/5*(0.5+height/width)*0.5}px Arial`
   const text = `${width}x${height}`;
+
+  ctx.fillStyle = '#000';
+//   ctx.font = `${text.length * 0.6 * width / 25}px Arial` // width/5*(0.5+height/width)*0.5
+  ctx.font = `${text.length * 0.6 * Math.min(height, width) / 33}px Arial`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillText(text, width / 2, height / 2);
 
 //   const lineWidth = width/5*(0.5+height/width)*0.5/50
 
-//   drawLine(ctx, width * 0.01, height-height*0.01, width*0.1, height-height*0.1, '#000', lineWidth)
-//   drawLine(ctx, width * 0.01, height-height*0.01, width*0.1, height-height*0.01, '#000', lineWidth)
-//   drawLine(ctx, width * 0.01, height-height*0.01, width*0.01, height-height*0.1, '#000', lineWidth)
+//   drawLine(ctx, width * 0.01, height-height*0.01, width-width*0.01, height-height*0.01, '#000', lineWidth)
+//   drawLine(ctx, width * 0.01, height*0.01, width-width*0.01, height*0.01, '#000', lineWidth)
 
-//   drawLine(ctx, width * 0.01, height*0.01, width*0.1, height*0.1, '#000', lineWidth)
-//   drawLine(ctx, width * 0.01, height*0.01, width*0.1, height*0.01, '#000', lineWidth)
-//   drawLine(ctx, width * 0.01, height*0.01, width*0.01, height*0.1, '#000', lineWidth)
-
-//   drawLine(ctx, width-width * 0.01, height-height*0.01, width-width*0.1, height-height*0.1, '#000', lineWidth)
-//   drawLine(ctx, width-width * 0.01, height-height*0.01, width-width*0.1, height-height*0.01, '#000', lineWidth)
-//   drawLine(ctx, width-width * 0.01, height-height*0.01, width-width*0.01, height-height*0.1, '#000', lineWidth)
+//   drawLine(ctx, width * 0.01, height-height*0.01, width*0.01, height*0.01, '#000', lineWidth)
+//   drawLine(ctx, width-width * 0.01, height*0.01, width-width*0.01, height-height*0.01, '#000', lineWidth)
   
-//   drawLine(ctx, width-width * 0.01, height*0.01, width-width*0.1, height*0.1, '#000', lineWidth)
-//   drawLine(ctx, width-width * 0.01, height*0.01, width-width*0.1, height*0.01, '#000', lineWidth)
-//   drawLine(ctx, width-width * 0.01, height*0.01, width-width*0.01, height*0.1, '#000', lineWidth)
+//   drawLine(ctx, width * 0.01, height-height*0.01, width-width*0.01, height*0.01, '#000', lineWidth)
+//   drawLine(ctx, width * 0.01, height*0.01, width-width*0.01, height-height*0.01, '#000', lineWidth)
 
   res.setHeader('Content-Type', 'image/png');
   res.send(canvas.toBuffer());
