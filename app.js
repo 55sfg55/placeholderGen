@@ -65,6 +65,7 @@ function getBrightness(colorString) {
 }
 
 app.get('/image/:dimensions?/:color?', (req, res) => {
+  // params to add: brighten the lines (% e.g. 20), text color, invert color (automatc true if below 20% brightness), change the background color handling, disable text/lines, own text
 
   console.log('\n\n\n');
   console.time('response');
