@@ -17,7 +17,7 @@ function parseColor(colorString) {
   }
 }
 
-function drawLine(ctx, startX, startY, endX, endY, color = '#000', lineWidth = 1) {
+function drawLine(ctx, startX, startY, endX, endY, color, lineWidth = 1) {
   ctx.beginPath();
   ctx.moveTo(startX, startY);
   ctx.lineTo(endX, endY);
@@ -26,10 +26,42 @@ function drawLine(ctx, startX, startY, endX, endY, color = '#000', lineWidth = 1
   ctx.stroke();
 }
 
-function drawEmptyRectangle(ctx, x, y, width, height, color = '#000', lineWidth = 1) {
+function drawEmptyRectangle(ctx, x, y, width, height, color, lineWidth = 1) {
   ctx.strokeStyle = color; 
   ctx.lineWidth = lineWidth;  
   ctx.strokeRect(x, y, width, height);  
+}
+
+function lightenColor(colorString, procent) {
+  procent /= 100
+  try {
+    let parsedColor = color(colorString);
+    console.log(parsedColor)
+
+    if (parseColor.isBlack()) {
+      return '#404040'
+    }
+
+    return parsedColor ? parsedColor.lighten(procent).hex() : color("black").lighten(procent).hex();
+  } catch (e) {
+
+    console.error('Invalid color string:', colorString);
+    return '#404040'
+  }
+}
+
+function getBrightness(colorString) {
+  try {
+    const parsedColor = color(colorString);
+    const rgb = parsedColor.rgb().array(); 
+
+    const brightness = 0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2];
+
+    return brightness; 
+  } catch (e) {
+    console.error('Error calculating brightness:', e);
+    return 0; 
+  }
 }
 
 app.get('/image/:dimensions?/:color?', (req, res) => {
@@ -73,28 +105,36 @@ app.get('/image/:dimensions?/:color?', (req, res) => {
 
   const text = `${width}x${height}`;
 
-  console.time('Draw Text');
-  ctx.fillStyle = '#000';
-  ctx.font = `${text.length * 0.6 * Math.min(height, width) / 33}px Arial`;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(text, width / 2, height / 2);
-  console.timeEnd('Draw Text');
-
-
-  console.time('lineWidth');
   const lineWidth = (width / 5) * (0.5 + height / width) * 0.5 / 50;
-  console.timeEnd('lineWidth');
+  const brighterColor = lightenColor('#000', 25);
+  console.timeEnd('line Width and color');
 
   console.time('Draw Lines');
   // drawLine(ctx, width * 0.01, height - height * 0.01, width - width * 0.01, height - height * 0.01, '#000', lineWidth);
   // drawLine(ctx, width * 0.01, height * 0.01, width - width * 0.01, height * 0.01, '#000', lineWidth);
   // drawLine(ctx, width * 0.01, height - height * 0.01, width * 0.01, height * 0.01, '#000', lineWidth);
   // drawLine(ctx, width - width * 0.01, height * 0.01, width - width * 0.01, height - height * 0.01, '#000', lineWidth);
-  drawLine(ctx, width * 0.01, height - height * 0.01, width - width * 0.01, height * 0.01, '#000', lineWidth);
-  drawLine(ctx, width * 0.01, height * 0.01, width - width * 0.01, height - height * 0.01, '#000', lineWidth);
-  drawEmptyRectangle(ctx, width * 0.01, height * 0.01, width * 0.98, height * 0.98, '#000', lineWidth)
+  drawLine(ctx, width * 0.01, height - height * 0.01, width - width * 0.01, height * 0.01, brighterColor, lineWidth);
+  drawLine(ctx, width * 0.01, height * 0.01, width - width * 0.01, height - height * 0.01, brighterColor, lineWidth);
+  drawEmptyRectangle(ctx, width * 0.01, height * 0.01, width * 0.98, height * 0.98, brighterColor, lineWidth);
   console.timeEnd('Draw Lines');
+
+  console.time('Draw Text');
+  
+  console.time('line Width and color');
+
+  // If background color's brightness is 20% or below use white text color
+  if (getBrightness(parsedColor) <= 256 * 0.2) {
+    ctx.fillStyle = '#ffffff'
+  }
+  else {
+    ctx.fillStyle = '#000';
+  }
+  ctx.font = `${text.length * 0.6 * Math.min(height, width) / 33}px Arial`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(text, width / 2, height * 0.487);
+  console.timeEnd('Draw Text');
 
   console.time('Buffer Creation (canvas)');
 
