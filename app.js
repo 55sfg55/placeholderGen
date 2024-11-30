@@ -1,7 +1,7 @@
 const express = require('express');
 const { createCanvas } = require('canvas');
 const color = require('color');
-const sharp = require('sharp'); // Import sharp for processing raw buffers
+const sharp = require('sharp'); 
 
 const app = express();
 const port = 3300;
@@ -27,9 +27,9 @@ function drawLine(ctx, startX, startY, endX, endY, color = '#000', lineWidth = 1
 }
 
 function drawEmptyRectangle(ctx, x, y, width, height, color = '#000', lineWidth = 1) {
-  ctx.strokeStyle = color;  // Set the border color
-  ctx.lineWidth = lineWidth;  // Set the border width
-  ctx.strokeRect(x, y, width, height);  // Draw only the border (empty rectangle)
+  ctx.strokeStyle = color; 
+  ctx.lineWidth = lineWidth;  
+  ctx.strokeRect(x, y, width, height);  
 }
 
 app.get('/image/:dimensions?/:color?', (req, res) => {
@@ -81,7 +81,7 @@ app.get('/image/:dimensions?/:color?', (req, res) => {
   ctx.fillText(text, width / 2, height / 2);
   console.timeEnd('Draw Text');
 
-  // Benchmarking line 
+
   console.time('lineWidth');
   const lineWidth = (width / 5) * (0.5 + height / width) * 0.5 / 50;
   console.timeEnd('lineWidth');
@@ -97,7 +97,7 @@ app.get('/image/:dimensions?/:color?', (req, res) => {
   console.timeEnd('Draw Lines');
 
   console.time('Buffer Creation (canvas)');
-  // Get raw RGBA buffer from the canvas
+
   const rawBuffer = canvas.toBuffer('raw');
   console.timeEnd('Buffer Creation (canvas)');
 
@@ -113,12 +113,12 @@ app.get('/image/:dimensions?/:color?', (req, res) => {
   }
 
   console.time("Buffer Creation (sharp)")
-  // Convert the raw buffer to a PNG buffer using sharp
+
   sharp(rawBuffer, {
     raw: {
       width: width,
       height: height,
-      channels: 4, // RGBA channels
+      channels: 4, 
     }
   })
     .png({ compressionLevel: compressionLevel })
@@ -126,7 +126,7 @@ app.get('/image/:dimensions?/:color?', (req, res) => {
     .then((outputBuffer) => {
       console.timeEnd("Buffer Creation (sharp)")
       console.timeEnd('response');
-      // Send the resulting PNG buffer to the client
+
       res.setHeader('Content-Type', 'image/png');
       res.send(outputBuffer);
     })
