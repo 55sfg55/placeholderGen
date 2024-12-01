@@ -180,7 +180,7 @@ app.get('/image/:dimensions?/:backgroundColor?', (req, res) => {
       ctx.fillStyle = baseColor;
     }
 
-    ctx.font = `${((text.length * 0.6 * Math.min(height, width) * 0.4) / (5 * text.length)) * scale }px Arial`; // placeholder formula
+    ctx.font = `${((text.length * 0.6 * Math.min(height, width)) / (5 * text.length)) * scale }px Arial`; // placeholder formula
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
 
