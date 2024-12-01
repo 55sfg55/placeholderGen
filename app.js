@@ -42,7 +42,13 @@ function lightenColor(procent, customColor, baseColor = 'rgb(30,30,30)') {
     let parsedColor = color(colorString);
     console.log(parsedColor.color, "asd")
 
-    // For some reason color() has wrong order of color (bgr)
+    if ( parsedColor.color[0] < 30 && parsedColor.color[0] < 30 && parsedColor.color[0] < 30 ) { // && !(enlightLines)
+      parsedColor.color[0] = 30
+      parsedColor.color[1] = 30
+      parsedColor.color[2] = 30
+    }
+
+    // For some reason color() has wrong order of color (bgr), this fixes it:
     let temp = parsedColor.color[0];
     parsedColor.color[0] = parsedColor.color[2];
     parsedColor.color[2] = temp;
@@ -72,7 +78,7 @@ function getBrightness(colorString) {
   }
 }
 
-app.get('/image/:dimensions?/:color?', (req, res) => {
+app.get('/image/:dimensions?/:backgroundColor?', (req, res) => {
   // params to add: brighten the lines (% e.g. 20), text color, invert color (automatc true if below 20% brightness), change the background color handling, disable text/lines, own text
   /*
     visuals = true/false
@@ -87,18 +93,19 @@ app.get('/image/:dimensions?/:color?', (req, res) => {
 
   console.log('\n\n\n');
 
-  // Access query parameters
-  const { visuals, lines, enableText, colorText, linesColor, textCustom  } = req.query;
+  const { visuals, lines, enableText, colorText, linesColor, textCustom, textOrientation  } = req.query;
   const customText = req.query.text
-  const baseColor = req.query.color ? req.query.color : '#000000'
-  console.log('Query Parameters:', { visuals, lines, enableText, customText, baseColor, colorText, linesColor, textCustom });
+  console.log(req.query.color, "asd")
+  const baseColor = req.query.color ? parseColor(req.query.color) : '#000000'
+  const scale = req.query.scale ? req.query.scale : 1
+  console.log('Query Parameters:', { visuals, lines, enableText, customText, baseColor, colorText, linesColor, textCustom, scale, textOrientation });
 
 
   console.time('response');
 
   console.time('params');
-  const { dimensions, color } = req.params;
-  console.log(dimensions, color)
+  const { dimensions, backgroundColor } = req.params;
+  console.log(dimensions, backgroundColor)
   console.timeEnd('params');
 
   console.time('Parse Dimensions');
@@ -112,7 +119,7 @@ app.get('/image/:dimensions?/:color?', (req, res) => {
   console.timeEnd('err400');
 
   console.time('Parse Color');
-  const parsedColor = parseColor(color);
+  const parsedColor = parseColor(backgroundColor);
   console.timeEnd('Parse Color');
 
   console.time('err400no2');
@@ -131,12 +138,28 @@ app.get('/image/:dimensions?/:color?', (req, res) => {
   ctx.fillRect(0, 0, width, height);
   console.timeEnd('Fill Background');
 
-  const text = `${width}x${height}`;
+  let text;
+
+  if ( customText ) {
+    text = customText
+  }
+  else {
+    text = `${width}x${height}`;
+  }
 
   if ( ( (!(lines) && ( visuals !== 'false')) || lines === 'true') ) {
     console.time('line Width and color');
+
+    let brighterColor;
+    // If background color's brightness is 20% or below use white text color (invert)
+    if (getBrightness(parsedColor) <= 256 * 0.2) {
+      brighterColor = lightenColor(-25, color(baseColor).negate().hex())
+    }
+    else {
+      brighterColor = lightenColor(25, baseColor);
+    }
+
     const lineWidth = (width / 5) * (0.5 + height / width) * 0.5 / 50;
-    const brighterColor = lightenColor(25);
     console.timeEnd('line Width and color');
 
     console.time('Draw Lines');
@@ -149,18 +172,48 @@ app.get('/image/:dimensions?/:color?', (req, res) => {
   if ( ( (!(enableText) && ( visuals !== 'false')) || enableText === 'true') ) {
     console.time('Draw Text');
 
-
-    // If background color's brightness is 20% or below use white text color (invert)
+    // If background color's brightness is 20% or below invert text color.
     if (getBrightness(parsedColor) <= 256 * 0.2) {
-      ctx.fillStyle = '#ffffff'
+      ctx.fillStyle = color(baseColor).negate().hex()
     }
     else {
-      ctx.fillStyle = '#000';
+      ctx.fillStyle = baseColor;
     }
-    ctx.font = `${text.length * 0.6 * Math.min(height, width) / 33}px Arial`;
+
+    ctx.font = `${((text.length * 0.6 * Math.min(height, width) * 0.4) / (5 * text.length)) * scale }px Arial`; // placeholder formula
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(text, width / 2, height * 0.487);
+
+    switch (textOrientation) {
+      case 'vertical':
+        ctx.save();
+        ctx.translate(width * 0.5, height * 0.5);  
+        ctx.rotate(Math.PI / 2);  
+        ctx.fillText(text, 0, 0);  
+        ctx.restore();  
+        break;
+    
+      case 'flippedVertical':
+        ctx.save();
+        ctx.translate(width * 0.5, height * 0.5);  
+        ctx.rotate(-Math.PI / 2);  
+        ctx.fillText(text, 0, 0);  
+        ctx.restore();  
+        break;
+    
+      case 'flippedHorizontal':
+        ctx.save();
+        ctx.translate(width * 0.5, height * 0.5);  
+        ctx.rotate(Math.PI);  
+        ctx.fillText(text, 0, 0);  
+        ctx.restore();  
+        break;
+    
+      case 'horizontal':
+      default:
+        ctx.fillText(text, width /2, height /2);
+        break;
+      }
 
     console.timeEnd('Draw Text');
   }
