@@ -81,24 +81,24 @@ function getBrightness(colorString) {
 app.get('/image/:dimensions?/:backgroundColor?', (req, res) => {
   // params to add: brighten the lines (% e.g. 20), text color, invert color (automatc true if below 20% brightness), change the background color handling, disable text/lines, own text
   /*
-    visuals = true/false
-    lines = true/false
-    text = string
-    disableText = true/false
-    color = any format, lines + text
+    - visuals = true/false
+    - lines = true/false
+    - text = string
+    - disableText = true/false
+    -color = any format, lines + text
     linesColor = any format, lines
     textColor = any format, text
-    textCustom = pure text
+    backgroundColor = any format, background
   */
 
   console.log('\n\n\n');
 
-  const { visuals, lines, enableText, colorText, linesColor, textCustom, textOrientation  } = req.query;
+  const { visuals, lines, enableText, colorText, linesColor, textOrientation  } = req.query;
   const customText = req.query.text
   console.log(req.query.color, "asd")
   const baseColor = req.query.color ? parseColor(req.query.color) : '#000000'
   const scale = req.query.scale ? req.query.scale : 1
-  console.log('Query Parameters:', { visuals, lines, enableText, customText, baseColor, colorText, linesColor, textCustom, scale, textOrientation });
+  console.log('Query Parameters:', { visuals, lines, enableText, customText, baseColor, colorText, linesColor, scale, textOrientation });
 
 
   console.time('response');
